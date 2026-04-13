@@ -70,8 +70,8 @@ multisend --silent "low priority note"
 multisend --image /tmp/graph.png "Weekly stats" -b reports
 
 # Send a video (inline playback)
-multisend --video /tmp/clip.mp4 -b victoria
-multisend --video /tmp/clip.mp4 "check this out" -b victoria
+multisend --video /tmp/clip.mp4 -b mybot
+multisend --video /tmp/clip.mp4 "check this out" -b mybot
 
 # Send a file
 multisend --file /tmp/backup.tar.gz -b homelab
@@ -89,7 +89,7 @@ All sends and errors are logged automatically to `~/.config/multisend/multisend.
 Logs rotate at 5 MB and keep up to 5 files (`multisend.log`, `multisend.log.1` … `.5`).
 
 ```
-2026-04-13 14:22:01  INFO      sent bot=victoria chat_id=55667788 message_id=42
+2026-04-13 14:22:01  INFO      sent bot=mybot chat_id=55667788 message_id=42
 2026-04-13 14:22:08  ERROR     failed bot=alerts chat_id=112233445 error=Network error: ...
 ```
 
