@@ -247,7 +247,7 @@ def do_send(args):
     targets = resolve_bots(cfg, bot_names, args.all)
 
     # Determine message text
-    if args.file or args.image:
+    if args.file or args.image or args.video:
         text = args.message or args.caption or None
     elif not sys.stdin.isatty() and not args.message:
         text = sys.stdin.read().rstrip("\n")
@@ -263,6 +263,9 @@ def do_send(args):
             if args.image:
                 resp = send_file_urllib(token, chat_id, args.image, text,
                                         "sendPhoto", "photo", args.silent)
+            elif args.video:
+                resp = send_file_urllib(token, chat_id, args.video, text,
+                                        "sendVideo", "video", args.silent)
             elif args.file:
                 resp = send_file_urllib(token, chat_id, args.file, text,
                                         "sendDocument", "document", args.silent)
@@ -324,10 +327,12 @@ examples:
                    help="Parse message as HTML")
     p.add_argument("--image", metavar="PATH",
                    help="Send an image file")
+    p.add_argument("--video", metavar="PATH",
+                   help="Send a video file (inline playback)")
     p.add_argument("--file", metavar="PATH",
                    help="Send a file as document")
     p.add_argument("--caption", metavar="TEXT",
-                   help="Caption for --image or --file")
+                   help="Caption for --image, --video, or --file")
 
     # Management subcommands
     p.add_argument("--configure", action="store_true",
