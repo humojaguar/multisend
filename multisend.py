@@ -166,7 +166,7 @@ def cmd_configure(args):
         print("Error: name cannot be empty.", file=sys.stderr)
         sys.exit(1)
 
-    existing = cfg.get(bot_name, {})
+    existing = cfg[bot_name] if bot_name in cfg else {}
     token = input(f"Bot token [{existing.get('token', '')}]: ").strip() or existing.get("token", "")
     chat_id = input(f"Chat ID  [{existing.get('chat_id', '')}]: ").strip() or existing.get("chat_id", "")
 
