@@ -69,6 +69,10 @@ multisend --silent "low priority note"
 # Send image with caption
 multisend --image /tmp/graph.png "Weekly stats" -b reports
 
+# Send a video (inline playback)
+multisend --video /tmp/clip.mp4 -b victoria
+multisend --video /tmp/clip.mp4 "check this out" -b victoria
+
 # Send a file
 multisend --file /tmp/backup.tar.gz -b homelab
 
@@ -77,6 +81,22 @@ multisend -q "cron job done"
 
 # Print config file path
 multisend --config-file
+```
+
+## Logging
+
+All sends and errors are logged automatically to `~/.config/multisend/multisend.log`.
+Logs rotate at 5 MB and keep up to 5 files (`multisend.log`, `multisend.log.1` … `.5`).
+
+```
+2026-04-13 14:22:01  INFO      sent bot=victoria chat_id=55667788 message_id=42
+2026-04-13 14:22:08  ERROR     failed bot=alerts chat_id=112233445 error=Network error: ...
+```
+
+Override the log path with `--log-file`:
+
+```bash
+multisend --log-file /var/log/multisend.log "hello"
 ```
 
 ## Config file format
@@ -116,3 +136,5 @@ fi
 - Multiple bots via `-b` are comma-separated with no spaces: `-b homelab,alerts`.
 - `--all` sends to every profile regardless of default.
 - Exit code is 0 on full success, 1 if any send fails (useful in scripts).
+- Video uploads are capped at 50 MB by the Telegram Bot API.
+- Log and config files both live under `~/.config/multisend/` by default.
