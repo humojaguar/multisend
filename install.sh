@@ -22,6 +22,7 @@ if [ ! -f "$SRC" ]; then
         echo "Error: curl or wget is required." >&2
         exit 1
     fi
+    chmod 644 "$TMP"
     SRC="$TMP"
 fi
 
