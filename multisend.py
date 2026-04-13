@@ -7,6 +7,8 @@ Usage: multisend [OPTIONS] MESSAGE
 
 import argparse
 import configparser
+import logging
+import logging.handlers
 import os
 import sys
 import json
@@ -19,6 +21,29 @@ CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / 
 CONFIG_FILE = CONFIG_DIR / "config.ini"
 
 TELEGRAM_API = "https://api.telegram.org/bot{token}/{method}"
+
+LOG_FILE = CONFIG_DIR / "multisend.log"
+LOG_MAX_BYTES = 5 * 1024 * 1024  # 5 MB
+LOG_BACKUP_COUNT = 5
+
+log = logging.getLogger("multisend")
+
+
+def setup_logging(log_file: Path = None):
+    log_file = log_file or LOG_FILE
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    handler = logging.handlers.RotatingFileHandler(
+        log_file,
+        maxBytes=LOG_MAX_BYTES,
+        backupCount=LOG_BACKUP_COUNT,
+        encoding="utf-8",
+    )
+    handler.setFormatter(logging.Formatter(
+        "%(asctime)s  %(levelname)-8s  %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    ))
+    log.addHandler(handler)
+    log.setLevel(logging.DEBUG)
 
 
 # ── Telegram API ────────────────────────────────────────────────────────────
@@ -278,11 +303,13 @@ def do_send(args):
                 resp = send_text(token, chat_id, text, parse_mode=parse_mode,
                                  disable_preview=args.no_preview, silent=args.silent)
 
+            msg_id = resp.get("result", {}).get("message_id", "?")
+            log.info("sent bot=%s chat_id=%s message_id=%s", name, chat_id, msg_id)
             if not args.quiet:
-                msg_id = resp.get("result", {}).get("message_id", "?")
                 print(f"✓ [{name}] sent (message_id={msg_id})")
         except Exception as e:
             errors.append((name, str(e)))
+            log.error("failed bot=%s chat_id=%s error=%s", name, chat_id, e)
             print(f"✗ [{name}] {e}", file=sys.stderr)
 
     if errors:
@@ -345,6 +372,8 @@ examples:
                    help="Set the default bot")
     p.add_argument("--config-file", action="store_true",
                    help="Print config file path")
+    p.add_argument("--log-file", metavar="PATH",
+                   help=f"Log file path (default: {LOG_FILE})")
 
     return p
 
@@ -352,6 +381,8 @@ examples:
 def main():
     parser = build_parser()
     args = parser.parse_args()
+
+    setup_logging(Path(args.log_file) if args.log_file else None)
 
     # Management commands
     if args.config_file:
