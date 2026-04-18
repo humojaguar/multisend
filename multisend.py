@@ -142,11 +142,11 @@ def save_config(cfg: configparser.ConfigParser):
     CONFIG_FILE.chmod(0o600)
 
 
-def get_bot_names(cfg: configparser.ConfigParser) -> list[str]:
+def get_bot_names(cfg: configparser.ConfigParser) -> list:
     return [s for s in cfg.sections() if s != "DEFAULT"]
 
 
-def resolve_bots(cfg: configparser.ConfigParser, names: list[str], all_bots: bool) -> list[tuple[str, str, str]]:
+def resolve_bots(cfg: configparser.ConfigParser, names: list, all_bots: bool) -> list:
     """Return list of (name, token, chat_id) tuples."""
     bot_names = get_bot_names(cfg)
     if not bot_names:
